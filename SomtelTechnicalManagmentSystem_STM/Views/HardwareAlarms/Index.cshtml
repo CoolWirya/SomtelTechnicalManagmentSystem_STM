@@ -1,0 +1,45 @@
+﻿@model IEnumerable<SystemAlarm>
+
+
+
+
+
+
+<h1>Hardware Alarms Page</h1>
+
+ <div class="container">
+  <div class="row">
+    <div class="col-6">
+      <div class="form-group">
+
+
+             @foreach (var sys in Model)
+        {
+                    if(@sys.Status == true)
+                    {
+                     <button type="button" class="btn btn-block btn-lg glow-button btn-success" style="width: 100px">@sys.System</button>
+                    }
+                    else
+                    {
+                         <button type="button" class="btn btn-block btn-lg glow-button btn-danger" style="width: 100px">@sys.System</button>
+                    }
+                <br />
+        }
+
+    @*    <button type="button" class="btn btn-block btn-lg glow-button btn-primary">Primary</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-secondary">Secondary</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-success">Success</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-danger">Danger</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-warning">Warning</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-info">Info</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-light">Light</button>
+        <button type="button" class="btn btn-block btn-lg glow-button btn-dark">Dark</button>*@
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
