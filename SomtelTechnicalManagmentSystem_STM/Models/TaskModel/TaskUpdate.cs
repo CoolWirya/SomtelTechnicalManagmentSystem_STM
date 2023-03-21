@@ -14,6 +14,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.TaskModel
         public int TaskId { get; set; }
         [ForeignKey("TaskId")]
         public Task Task { get; set; }
+        public bool DeleteFlag { get; set; }
 
     }
 }

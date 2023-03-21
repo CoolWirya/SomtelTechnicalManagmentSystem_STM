@@ -1,0 +1,37 @@
+﻿@model Login
+@{
+    ViewData["Title"] = "Signup Page";
+}
+
+<form asp-action="FirstSignIn" >
+
+       <div class="form-group">
+                    <label asp-for="PhoneNumber" class="control-label"></label>
+                    
+                    <input asp-for="PhoneNumber" class="form-control" type="number">                    
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+                </div>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+
+        <input asp-for="Password" class="form-control" type="number">
+
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+    </div>
+    <div class="form-group">
+        <label asp-for="OTP" class="control-label"></label>
+
+        <input asp-for="OTP" class="form-control" type="number">
+        <span style="color: red">@Html.Label((string)ViewBag.OTP)</span>
+
+        <span asp-validation-for="OTP" class="text-danger"></span>
+
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Enter" class="btn btn-outline-success float-right" />
+    </div>
+
+</form>

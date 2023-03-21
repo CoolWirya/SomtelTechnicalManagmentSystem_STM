@@ -29,11 +29,14 @@ namespace SomtelTechnicalManagmentSystem_STM
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));//here you define the datastore we will be using, in our case sql server
+            services.AddDbContext<ActiveXpertDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SMSC")));//here you define the datastore we will be using, in our case sql server
 
             services.AddControllersWithViews();
             services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IDynamicMenuService, DynamicMenuService>();
             services.AddScoped<ISystemAlarmService, SystemAlarmService>();
+            services.AddScoped<ISMSService, SMSService>();
+
 
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>

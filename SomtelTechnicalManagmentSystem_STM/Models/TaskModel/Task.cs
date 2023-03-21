@@ -45,5 +45,6 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.TaskModel
         public int? TeamId { get; set; }
         [ForeignKey("TeamId")]
         public Team Team { get; set; }
+        public bool DeleteFlag { get; set; }
     }
 }

@@ -55,26 +55,26 @@ namespace SomtelTechnicalManagmentSystem_STM.Data
                 if (!context.Privileges.Any())
                 {
                    
-                    context.Privileges.AddRange(new List<Privileges>()
-                    {
+                    //context.Privileges.AddRange(new List<Privilege>()
+                    //{
 
-                       new Privileges()
-                       {
+                    //   //new Privilege()
+                    //   //{
 
-                           PermissionName = "Admin",
-                           LoginId = UserIsmail.ElementAt(0),
+                    //   //    PermissionName = "Admin",
+                    //   //    LoginId = UserIsmail.ElementAt(0),
                            
                            
 
-                       },
-                       new Privileges()
-                       {
+                    //   //},
+                    //   //new Privilege()
+                    //   //{
 
-                           PermissionName = "Employee",
-                           LoginId =  UserMustafa.ElementAt(0)
-                       }
-                    });
-                    context.SaveChanges();
+                    //   //    PermissionName = "Employee",
+                    //   //    LoginId =  UserMustafa.ElementAt(0)
+                    //   //}
+                    //});
+                    //context.SaveChanges();
 
                 }
                 if (!context.Teams.Any())

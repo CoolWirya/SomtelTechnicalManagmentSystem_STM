@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SomtelTechnicalManagmentSystem_STM.Data.Security;
 using SomtelTechnicalManagmentSystem_STM.Data.Services;
 using SomtelTechnicalManagmentSystem_STM.Models;
+using SomtelTechnicalManagmentSystem_STM.Models.LoginModel;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,28 +72,55 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
         [HttpPost("login")]
         [AllowAnonymous]
 
-        public async Task<IActionResult> ValidateLoginCredentials(string username, string password, string returnUrl)
+        public async Task<IActionResult> ValidateLoginCredentials(string usernameOrEmail, string password, string returnUrl)
         {
 
             ViewData["ReturnUrl"] = returnUrl;
-            if ((username == "bob" || username == "ahmed") && password == "pizza" )
+            var loginDetails = await _service.GetByUsernameOrEmail(usernameOrEmail);
+            if (loginDetails != null)
             {
-                var claims = new List<Claim>();
-                claims.Add(new Claim("username", username)); //Just to know that you can create your own claim
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, username)); 
-                claims.Add(new Claim(ClaimTypes.Name, "Bon Edward Jones"));
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-                claims.Add(new Claim(ClaimTypes.Email, "ismail@gmail.com"));
-                claims.Add(new Claim(ClaimTypes.MobilePhone, "659000707"));
+                
+                Hash256 sha = new Hash256();
+                string hash = sha.GenerateSHA256Hash(password, loginDetails.Salt);
+                if(hash == loginDetails.Password)
+                {
+                    IEnumerable<string> getPermission = _service.GetRole(loginDetails.Id);
+                    var claims = new List<Claim>();
+                    //claims.Add(new Claim("username", loginDetails.UserName)); //Just to know that you can create your own claim
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, loginDetails.FullName));
+                    claims.Add(new Claim(ClaimTypes.Name, loginDetails.FullName));
+                    if (getPermission.Count() > 0)
+                    {
+                        foreach(var permissions in getPermission)
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, permissions));
+                        }
+ 
+                    }
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme); 
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity); 
-                await HttpContext.SignInAsync(claimsPrincipal); 
-               
-                return Redirect(returnUrl);
+                    claims.Add(new Claim(ClaimTypes.Email, loginDetails.Email));
+                    claims.Add(new Claim(ClaimTypes.MobilePhone, loginDetails.PhoneNumber));
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                    await HttpContext.SignInAsync(claimsPrincipal);
+
+                    return Redirect(returnUrl);
+                }
+                else
+                {
+                    TempData["Error"] = "Password is wrong";
+                    return View("login");
+                }
+              
             }
-            TempData["Error"] = "User is invalid";
-            return View("login");
+            else
+            {
+                TempData["Error"] = "User is invalid";
+                return View("login");
+            }
+           
+          
         }
         //[Authorize]
         public async Task<IActionResult> Logout()

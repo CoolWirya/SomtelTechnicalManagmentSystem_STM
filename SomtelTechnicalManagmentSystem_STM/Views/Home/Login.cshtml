@@ -17,7 +17,7 @@
 }
 
 <form action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" method="post"> <!--return url has slashes in them, so to lose them you do this-->
-    <input type="text" name="username" placeholder="Username" />
+    <input type="text" name="usernameOrEmail" placeholder="Email Or Username" />
     <input type="password" name="password" placeholder="Password" />
     <input type="submit" value="login" />
 </form>

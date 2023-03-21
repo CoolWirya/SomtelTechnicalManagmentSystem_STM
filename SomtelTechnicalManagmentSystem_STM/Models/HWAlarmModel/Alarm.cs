@@ -16,5 +16,6 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.HWAlarmModel
         public DateTime AlarmDate { get; set; }
         [ForeignKey("ServerAlarmID")]
         public ServerAlarm ServerAlarm { get; set; }
+        public bool DeleteFlag { get; set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SomtelTechnicalManagmentSystem_STM.Data.Security;
 using SomtelTechnicalManagmentSystem_STM.Data.Services;
-using SomtelTechnicalManagmentSystem_STM.Data.Classes;
 
 using SomtelTechnicalManagmentSystem_STM.Models.LoginModel;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SomtelTechnicalManagmentSystem_STM.Controllers
@@ -53,6 +55,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             {
                 return View(login);
             }
+            //Validate from DB
            bool userExists = await _service.CheckLoginUsernameExists(login.UserName);
            if (userExists)
                 ViewBag.UserName = "User name Exists";
@@ -65,11 +68,21 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
 
             if (numberExists || numberExists || emailExists)
                 return View(login);
-       
-                
 
-            await  _service.NewUser(login);
-           return RedirectToAction(nameof(Index));
+            //Validate Input
+            Dictionary<string, object> newUserDictionary  =  await  _service.AddNewUser(login);
+            if(Convert.ToBoolean(newUserDictionary["Added"]) == false)
+            {
+                if (Convert.ToBoolean(newUserDictionary["UsernameIsOK"]) == false)
+                    ViewBag.UserName = "User Name Should contain between 6 to 15 characters, be ('letters', 'Numbers', '_', '.', '-') and with no spaces";
+                if (Convert.ToBoolean(newUserDictionary["PhoneNumberIsOK"]) == false)
+                    ViewBag.PhoneNumber = "Number Is not in correct format, example: 659*******";
+                if (Convert.ToBoolean(newUserDictionary["EmailIsOK"]) == false)
+                    ViewBag.Email = "Email format not correct";
+                return View(login);
+            }
+            // return RedirectToAction(nameof(Index));
+            return View("FirstSignIn");
         }
 
         //Get: SignUp/Details/1
@@ -159,6 +172,69 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
                 return View("NotFound");
             await _service.UpdateAsync(id, loginDetails);
             return RedirectToAction(nameof(Index));
+        }
+
+       [HttpPost]
+        public async Task<IActionResult> ActivateUser(int id)
+        {
+            var loginDetails = await _service.GetByIdAsync(id);
+            loginDetails.Activate = true;
+            if (loginDetails == null)
+                return View("NotFound");
+            await _service.UpdateAsync(id, loginDetails);
+            return RedirectToAction(nameof(Index));
+        }
+
+        //Get
+        public IActionResult FirstSignIn()
+        {
+
+            if (!User.Identity.IsAuthenticated)
+            {
+               
+                return View();
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+
+        }
+
+        //Post
+        [HttpPost, ActionName("FirstSignIn")]
+        public async Task<IActionResult> ValidateOTPFirstSignIn(Login login)
+        {
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                var loginDetails = await _service.GetByPhoneNumber(login.PhoneNumber);
+                if(login.OTP == loginDetails.OTP)
+                {
+                    Hash256 sha = new Hash256();
+                    string salt = sha.CreateSalt(10);
+                    string hash = sha.GenerateSHA256Hash(login.Password, salt);
+                    loginDetails.Password = hash;
+                    loginDetails.Salt = salt;
+                    loginDetails.Activate = true;
+                    await _service.UpdateAsync(loginDetails.Id,loginDetails);
+                    return Redirect("/");
+                }
+                else
+                {
+                    ViewBag.OTP = "OTP Not Correct";
+                    return View("FirstSignIn");
+                }
+
+               
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+
         }
 
     }

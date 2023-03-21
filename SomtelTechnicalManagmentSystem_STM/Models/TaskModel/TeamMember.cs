@@ -20,5 +20,6 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.TaskModel
         [ForeignKey("TeamId")]
         public Team Team { get; set; }
 
+
     }
 }

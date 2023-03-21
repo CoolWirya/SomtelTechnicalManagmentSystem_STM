@@ -9,6 +9,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.NavBarModel
         public string ParentNavbarName { get; set; }
         public string ParentAspControl { get; set; }
         public string ParentAspAction { get; set; }
+        public bool DeleteFlag { get; set; }
 
 
     }

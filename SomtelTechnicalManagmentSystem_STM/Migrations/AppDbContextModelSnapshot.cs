@@ -32,6 +32,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<string>("AlarmType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -61,6 +64,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<DateTime>("AlarmDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Server")
                         .HasColumnType("nvarchar(max)");
 
@@ -86,6 +92,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
 
                     b.Property<DateTime>("AlarmDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
@@ -115,6 +124,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -158,24 +170,47 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.ToTable("Logins");
                 });
 
-            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Privileges", b =>
+            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Privilege", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LoginId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PermissionName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PrivilegeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LoginId");
 
+                    b.HasIndex("PrivilegeId");
+
                     b.ToTable("Privileges");
+                });
+
+            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.PrivilegeName", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PrivilegeNames");
                 });
 
             modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Team", b =>
@@ -206,6 +241,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ParentAspAction")
                         .HasColumnType("nvarchar(max)");
 
@@ -235,6 +273,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(max)");
@@ -347,6 +388,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("DeleteFlag")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -457,7 +501,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Privileges", b =>
+            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Privilege", b =>
                 {
                     b.HasOne("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.Login", "Login")
                         .WithMany()
@@ -465,7 +509,15 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SomtelTechnicalManagmentSystem_STM.Models.LoginModel.PrivilegeName", "PrivilegeName")
+                        .WithMany()
+                        .HasForeignKey("PrivilegeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Login");
+
+                    b.Navigation("PrivilegeName");
                 });
 
             modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.TaskModel.Task", b =>

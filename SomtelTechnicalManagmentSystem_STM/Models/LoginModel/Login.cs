@@ -32,6 +32,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Models.LoginModel
         public int? TeamId { get; set; }
         [ForeignKey("TeamId")]
         public Team Team { get; set; }
+        public bool DeleteFlag { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime LastLoginDate { get; set; }
     }

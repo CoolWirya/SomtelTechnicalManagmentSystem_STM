@@ -1,0 +1,14 @@
+﻿.appBody {
+    font-size: .7vw;
+    font-family: sans-serif;
+}
+
+
+
+@media screen and (min-width: 481px ) and (max-width: 1366px ) {
+    .appBody {
+        font-size: .9vw;
+        font-family: sans-serif;
+    }
+    
+}
