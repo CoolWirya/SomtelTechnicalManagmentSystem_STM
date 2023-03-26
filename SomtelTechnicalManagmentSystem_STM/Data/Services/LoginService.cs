@@ -12,18 +12,29 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
     {
         private readonly AppDbContext _context;
         private readonly ISMSService _smsservice;
-        
+
+
 
         public LoginService(AppDbContext context, ISMSService smsservice)
         {
             _context = context;
             _smsservice = smsservice;
-            
+
 
         }
         public IQueryable<Login> LoginDbContext()
         {
             IQueryable<Login> IQcontext = _context.Logins.Where(n => n.DeleteFlag == false);
+            return IQcontext;
+        }
+        public IQueryable<PrivilegeName> PrivilegeNameDbContext()
+        {
+            IQueryable<PrivilegeName> IQcontext = _context.PrivilegeNames.Where(n => n.DeleteFlag == false);
+            return IQcontext;
+        }
+        public IQueryable<Privilege> PrivilegeDbContext()
+        {
+            IQueryable<Privilege> IQcontext = _context.Privileges.Where(n => n.DeleteFlag == false);
             return IQcontext;
         }
         public async Task AddAsync(Login login)
@@ -32,8 +43,13 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
             await _context.Logins.AddAsync(login);
             await _context.SaveChangesAsync();
         }
+        public async Task AddPrivilege(Privilege privilege)
+        {
 
-   
+            await _context.Privileges.AddAsync(privilege);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task DeleteAsync(int id)
         {
@@ -47,7 +63,65 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
             var results = await LoginDbContext().ToListAsync();
             return results;
         }
+        public List<Login> GetAllIdAndUsername()
+        {
+            var results = LoginDbContext().Select(n => new { Id = n.Id, UserName = n.UserName });
+            List<Login> logins = new List<Login>();
 
+            foreach (var result in results)
+            {
+                logins.Add(new Login { Id = result.Id, UserName = result.UserName });
+            }
+            return logins;
+        }
+        public List<PrivilegeName> GetAllPrivileges()
+        {
+
+            var results = PrivilegeNameDbContext().Select(n => new { Id = n.Id, Name = n.Name });
+            List<PrivilegeName> privilegeNames = new List<PrivilegeName>();
+
+            foreach (var result in results)
+            {
+                privilegeNames.Add(new PrivilegeName { Id = result.Id, Name = result.Name });
+            }
+            return privilegeNames;
+
+        }
+        public List<Privilege> GetMyPrivileges(int userId)
+        {
+
+            var results = PrivilegeDbContext().Where(n => n.LoginId == userId);
+            List<Privilege> privilege = new List<Privilege>();
+
+            foreach (var result in results)
+            {
+                privilege.Add(new Privilege { PrivilegeId = result.PrivilegeId });
+            }
+            return privilege;
+
+        }
+
+
+        public List<PrivilegeName> GetNotInMyPrivileges(int userId)
+        {
+            var resultUser = PrivilegeDbContext().Where(n => n.LoginId == userId);
+            var resultsAll = PrivilegeNameDbContext().ToList();
+
+            List<PrivilegeName> privilegeName = new List<PrivilegeName>();
+
+
+            foreach (var result in resultsAll)
+            {
+                if (resultUser.All(n => n.PrivilegeId != result.Id))
+                {
+                    privilegeName.Add(new PrivilegeName { Id = result.Id, Name = result.Name });
+
+                }
+
+            }
+
+            return privilegeName;
+        }
         public async Task<Login> GetByIdAsync(int id)
         {
             var results = await LoginDbContext().FirstOrDefaultAsync(n => n.Id == id);
@@ -57,7 +131,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
         public async Task<Login> GetByUsernameOrEmail(string usernameOrEmail)
         {
             var results = await LoginDbContext().FirstOrDefaultAsync(n => n.Email == usernameOrEmail && n.Activate == true);
-            if(results == null)
+            if (results == null)
                 results = await LoginDbContext().FirstOrDefaultAsync(n => n.UserName == usernameOrEmail && n.Activate == true);
 
             return results;
@@ -71,7 +145,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
         }
 
 
-        public async Task<Dictionary<string,object>> AddNewUser(Login signup)
+        public async Task<Dictionary<string, object>> AddNewUser(Login signup)
         {
             Dictionary<string, object> newUserDictionary = new Dictionary<string, object>();
             newUserDictionary.Add("UsernameIsOK", true);
@@ -79,7 +153,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
             newUserDictionary.Add("PhoneNumberIsOK", true);
             newUserDictionary.Add("Added", false);
 
-            
+
             bool validatePhoneNumber = Validations.UserInputValidation.ValidatePhoneNumber(signup.PhoneNumber);
             if (!validatePhoneNumber)
                 newUserDictionary["PhoneNumberIsOK"] = false;
@@ -97,7 +171,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
             Random random = new Random();
             signup.OTP = random.Next(10000, 99999).ToString();
             signup.CreationDate = System.DateTime.Now;
-           
+
             _smsservice.InsertSMS("SCHEDULED", "TTS", "252" + signup.PhoneNumber, "STM System", "OTP: " + signup.OTP);
 
             await AddAsync(signup);
@@ -152,20 +226,24 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
 
         public IEnumerable<string> GetRole(int id)
         {
-            IEnumerable<string> empty = new List<string> { ""};
-            /*
-             var results = from login in _context.Logins
-                          join permission in _context.Privileges
-                          on login.Id equals permission.LoginId
-                          select new  {  permission.PermissionName };
 
 
-            
-            return results.Select(n => (n.PermissionName)).ToList();
-            */
+            var results = from a in _context.PrivilegeNames
+                          join b in _context.Privileges on a.Id equals b.PrivilegeId
+                          join c in _context.Logins on b.LoginId equals c.Id
+                          where c.Id == id
 
-            return empty;
+
+                          select new { a.Name };
+
+
+
+            return results.Select(n => (n.Name)).ToList();
+
+
 
         }
+
+
     }
 }

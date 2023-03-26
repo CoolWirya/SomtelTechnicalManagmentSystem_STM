@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SomtelTechnicalManagmentSystem_STM.Data.Security;
 using SomtelTechnicalManagmentSystem_STM.Data.Services;
 
 using SomtelTechnicalManagmentSystem_STM.Models.LoginModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SomtelTechnicalManagmentSystem_STM.Controllers
@@ -18,10 +23,11 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             _service = service;
         }
 
+
         //Get:SignUp
         public async Task<IActionResult> Index()
         {
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                 var data = await _service.GetAllAsync();
                 return View(data);
@@ -33,11 +39,12 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
        
         }
 
+
         //Get: SignUp/Create
         public IActionResult Create()
         {
 
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                 return View();
             }
@@ -58,7 +65,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             //Validate from DB
            bool userExists = await _service.CheckLoginUsernameExists(login.UserName);
            if (userExists)
-                ViewBag.UserName = "User name Exists";
+                ViewBag.UsernameId = "User name Exists";
             bool numberExists = await _service.CheckLoginNumberExists(login.PhoneNumber);
             if (numberExists)
                 ViewBag.PhoneNumber = "Phone Number Exists";
@@ -74,9 +81,9 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             if(Convert.ToBoolean(newUserDictionary["Added"]) == false)
             {
                 if (Convert.ToBoolean(newUserDictionary["UsernameIsOK"]) == false)
-                    ViewBag.UserName = "User Name Should contain between 6 to 15 characters, be ('letters', 'Numbers', '_', '.', '-') and with no spaces";
+                    ViewBag.UsernameId = "User Name Should contain between 6 to 15 characters, be ('letters''Numbers''_''-') and with no spaces";
                 if (Convert.ToBoolean(newUserDictionary["PhoneNumberIsOK"]) == false)
-                    ViewBag.PhoneNumber = "Number Is not in correct format, example: 659*******";
+                    ViewBag.PhoneNumber = "Number is not in correct format, example: 659*******";
                 if (Convert.ToBoolean(newUserDictionary["EmailIsOK"]) == false)
                     ViewBag.Email = "Email format not correct";
                 return View(login);
@@ -85,11 +92,206 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             return View("FirstSignIn");
         }
 
+        //Get: SignUp/AssignPermissions
+        public IActionResult AssignPermissions()
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                List<Login> loginList = _service.GetAllIdAndUsername();
+                List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                ViewBag.UsernameId = new SelectList(loginList, "Id","UserName");
+                ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+
+                return View();
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+        [HttpPost]
+        public IActionResult AssignPermissionsMyPrivilges(string UsernameId)
+        {
+            ViewBag.ddlUserID = UsernameId;
+            if (User.IsInRole("Admin"))
+            {
+
+                    List<Login> loginList = _service.GetAllIdAndUsername();
+                    if (UsernameId != null)
+                    {
+                        List<PrivilegeName> privilageList = _service.GetNotInMyPrivileges(int.Parse(UsernameId));
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName", UsernameId);
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        return View("AssignPermissions");
+                    }
+                    else
+                    {
+                        List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        if (UsernameId == null)
+                            ViewBag.UserError = "Choose a user before submitting";
+                        return View("AssignPermissions");
+
+                    }
+
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignPermissions( string PrivilegeNameId, string hiddenfield_id)
+        {
+            string UsernameId = hiddenfield_id;
+
+            if (User.IsInRole("Admin"))
+            {
+                if(UsernameId == null || PrivilegeNameId == null)
+                {
+                    List<Login> loginList = _service.GetAllIdAndUsername();
+                    if (UsernameId != null)
+                    {
+                        List<PrivilegeName> privilageList = _service.GetNotInMyPrivileges(int.Parse(UsernameId));
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName", UsernameId);
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        return View();
+                    }
+                    else
+                    {
+                        List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        if (UsernameId == null)
+                            ViewBag.UserError = "Choose a user before submitting";
+                        if (PrivilegeNameId == null)
+                            ViewBag.PrivilegeError = "Choose a privilege before submitting";
+                        return View();
+
+                    }
+                   
+                }
+                else
+                {
+                    var results = _service.GetMyPrivileges(int.Parse(UsernameId));
+                    foreach (var result in results)
+                    {
+                        if (result.PrivilegeId == int.Parse(PrivilegeNameId))
+                        {
+                            List<Login> loginList = _service.GetAllIdAndUsername();
+                            List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                            ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                            ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                            ViewBag.PrivilegeError = "User already have this permission";
+                            return View();
+                        }
+                    }
+
+                    Privilege privilege = new Privilege();
+                    privilege.LoginId = int.Parse(UsernameId);
+                    privilege.PrivilegeId = int.Parse(PrivilegeNameId);
+                    await _service.AddPrivilege(privilege);
+
+                    return Redirect("/");
+                }
+
+                
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignPermissionsDropDownPostback(string UsernameId,string PrivilegeNameId)
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                if (UsernameId == null || PrivilegeNameId == null)
+                {
+                    List<Login> loginList = _service.GetAllIdAndUsername();
+                    if (UsernameId != null)
+                    {
+                        List<PrivilegeName> privilageList = _service.GetNotInMyPrivileges(int.Parse(UsernameId));
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName", UsernameId);
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        return View();
+                    }
+                    else
+                    {
+                        List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        if (UsernameId == null)
+                            ViewBag.UserError = "Choose a user before submitting";
+                        if (PrivilegeNameId == null)
+                            ViewBag.PrivilegeError = "Choose a privilege before submitting";
+                        return View();
+
+                    }
+
+                }
+                else
+                {
+                    var results = _service.GetMyPrivileges(int.Parse(UsernameId));
+                    foreach (var result in results)
+                    {
+                        if (result.PrivilegeId == int.Parse(PrivilegeNameId))
+                        {
+                            List<Login> loginList = _service.GetAllIdAndUsername();
+                            List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                            ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                            ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                            ViewBag.PrivilegeError = "User already have this permission";
+                            return View();
+                        }
+                    }
+
+                    Privilege privilege = new Privilege();
+                    privilege.LoginId = int.Parse(UsernameId);
+                    privilege.PrivilegeId = int.Parse(PrivilegeNameId);
+                    await _service.AddPrivilege(privilege);
+
+                    return Redirect("/");
+                }
+
+
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+        public async Task<IActionResult> AssignPermissionsDropDownPostback()
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                List<Login> loginList = _service.GetAllIdAndUsername();
+                List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+
+                return View();
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
         //Get: SignUp/Details/1
         public async Task<IActionResult> Details(int id)
         {
 
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                 var loginDetails = await _service.GetByIdAsync(id);
                 if (loginDetails == null)
@@ -108,7 +310,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
         public async Task<IActionResult> Edit(int id)
         {
 
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                 var loginDetails = await _service.GetByIdAsync(id);
                 if (loginDetails == null)
@@ -136,8 +338,8 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
         //Get: SignUp/Delete/1
         public async Task<IActionResult> Delete(int id)
         {
-          
-            if (!User.Identity.IsAuthenticated)
+
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                 var loginDetails = await _service.GetByIdAsync(id);
                 if (loginDetails == null)
@@ -163,7 +365,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         public async Task<IActionResult> Deactivate(int id)
         {
             var loginDetails = await _service.GetByIdAsync(id);
@@ -189,7 +391,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
         public IActionResult FirstSignIn()
         {
 
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
             {
                
                 return View();

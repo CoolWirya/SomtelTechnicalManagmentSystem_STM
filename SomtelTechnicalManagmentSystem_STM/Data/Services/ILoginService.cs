@@ -9,6 +9,11 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
     public interface ILoginService
     {
         Task<IEnumerable<Login>> GetAllAsync();
+        List<Login> GetAllIdAndUsername();
+        List<PrivilegeName> GetAllPrivileges();
+        List<Privilege> GetMyPrivileges(int userId);
+        List<PrivilegeName> GetNotInMyPrivileges(int userId);
+        Task AddPrivilege(Privilege privilege);
         Task<Login> GetByIdAsync(int id);
         Task<Login> GetByUsernameOrEmail(string usernameOrEmail);
         IEnumerable<string> GetRole(int id);

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SomtelTechnicalManagmentSystem_STM.Data;
 
 namespace SomtelTechnicalManagmentSystem_STM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230322080620_UpdatingOcsSupport1")]
+    partial class UpdatingOcsSupport1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,11 +330,8 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<string>("DurationType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FreeUnitId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FreeUnitName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("FreeUnitId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FreeUnitVolume")
                         .HasColumnType("nvarchar(max)");

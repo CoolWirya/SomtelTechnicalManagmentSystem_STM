@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SomtelTechnicalManagmentSystem_STM.Data;
 
 namespace SomtelTechnicalManagmentSystem_STM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230322080000_addingOcsSupport3")]
+    partial class addingOcsSupport3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,8 +324,8 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<bool>("DeleteFlag")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DurationType")
                         .HasColumnType("nvarchar(max)");
@@ -331,17 +333,14 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<string>("FreeUnitId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FreeUnitName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FreeUnitVolume")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
+                    b.Property<string>("Price")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ServiceID")
-                        .HasColumnType("int");
+                    b.Property<string>("ServiceID")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ServiceName")
                         .HasColumnType("nvarchar(max)");

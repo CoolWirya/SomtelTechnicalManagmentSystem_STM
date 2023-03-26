@@ -3,6 +3,7 @@ using SomtelTechnicalManagmentSystem_STM.Models.HWAlarmModel;
 using SomtelTechnicalManagmentSystem_STM.Models.LoginModel;
 using SomtelTechnicalManagmentSystem_STM.Models.TaskModel;
 using SomtelTechnicalManagmentSystem_STM.Models.NavBarModel;
+using SomtelTechnicalManagmentSystem_STM.Models.OCSSupportModel;
 
 namespace SomtelTechnicalManagmentSystem_STM.Data
 {
@@ -22,14 +23,16 @@ namespace SomtelTechnicalManagmentSystem_STM.Data
         public DbSet<TeamEquibment> TeamEquibment { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
         public DbSet<Login> Logins { get; set; }
+        public DbSet<PrivilegeName> PrivilegeNames { get; set; }
+
         public DbSet<Privilege> Privileges { get; set; }
         public DbSet<Alarm> Alarms { get; set; }
         public DbSet<ServerAlarm> ServerAlarms { get; set; }
         public DbSet<SystemAlarm> SystemAlarms { get; set; }
         public DbSet<NavbarParent> NavbarParent { get; set; }
-        public DbSet<PrivilegeName> PrivilegeNames { get; set; }
-
-
+        public DbSet<OcsService> OcsServices { get; set; }
+        public DbSet<OcsApiLog> OcsApiLogs { get; set; }
+        public DbSet<OcsExceptions> OcsExceptions { get; set; }
 
 
 

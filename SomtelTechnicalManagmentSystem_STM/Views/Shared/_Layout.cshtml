@@ -47,17 +47,20 @@
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="Task" asp-action="Team">Team Tasks</a></li>
                                 </ul>
                             </li>
-                        
-                       
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Exchange Services
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="OCSSupport" asp-action="Index">Exchange Services</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="OCSSupport" asp-action="Logs">Exchange Services Logs</a></li>
-                                </ul>
-                            </li>
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("OCS Mgr") || User.IsInRole("OCS Eng"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Exchange Services
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="OCSSupport" asp-action="Index">Exchange Services</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="OCSSupport" asp-action="Logs">Exchange Services Logs</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            
                         
                         
                       @*  @await Component.InvokeAsync("DynamicNavBar") <!--Here is the name of the class without ViewComponent-->*@
@@ -71,15 +74,30 @@
                      
 
                       <ul class="nav navbar-nav navbar-right">
-                           @if (!User.Identity.IsAuthenticated)
+                           @if (!User.Identity.IsAuthenticated || User.IsInRole("Admin"))
                         {
                             <li class="nav-item"  style="margin-right:10px">
-                                <a class="nav-link text-dark"   asp-area="" asp-controller="SignUp" asp-action="Index"><i class="bi bi-person-video2"></i> Sign Up</a>
-                            </li>
+                                @if(User.IsInRole("Admin"))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="SignUp" asp-action="Index"><i class="bi bi-person-video2"></i> Sign Up</a>
 
-                            <li class="nav-item" >
-                                <a class="nav-link text-dark"   asp-area="" asp-controller="Home" asp-action="Login"><i class="bi bi-box-arrow-right" ></i> Login</a></li>
+                                }
+                                else
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="SignUp" asp-action="Create"><i class="bi bi-person-video2"></i> Sign Up</a>
+
+                                }
+
+                            </li>
                         }
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login"><i class="bi bi-box-arrow-right"></i> Login</a>
+                            </li>
+                        }
+                    
+                        
                          @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">

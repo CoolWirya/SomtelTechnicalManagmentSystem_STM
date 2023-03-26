@@ -12,3 +12,9 @@
     }
     
 }
+
+/* LESS */
+.select2 {
+    .form-control;
+}
+

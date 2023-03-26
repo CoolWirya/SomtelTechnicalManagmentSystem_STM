@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SomtelTechnicalManagmentSystem_STM.Data;
 
 namespace SomtelTechnicalManagmentSystem_STM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230321105228_intialsetup")]
+    partial class intialsetup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,102 +258,6 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NavbarParent");
-                });
-
-            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.OCSSupportModel.OcsApiLog", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("ApiFunction")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ApiRequest")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ApiResponse")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ExchangeNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("OcsApiLogs");
-                });
-
-            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.OCSSupportModel.OcsExceptions", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Exception")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExceptionFrom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ExchangeNo")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.ToTable("OcsExceptions");
-                });
-
-            modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.OCSSupportModel.OcsService", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Channel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("DeleteFlag")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DurationType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FreeUnitId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FreeUnitName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FreeUnitVolume")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
-
-                    b.Property<int>("ServiceID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ServiceName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ServiceType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("OcsServices");
                 });
 
             modelBuilder.Entity("SomtelTechnicalManagmentSystem_STM.Models.TaskModel.Task", b =>

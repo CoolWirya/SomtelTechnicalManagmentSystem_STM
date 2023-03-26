@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SomtelTechnicalManagmentSystem_STM.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "OCS Eng")]
     public class TaskController : Controller
     {
+       
         public IActionResult Index()
         {
             return View();
