@@ -10,8 +10,8 @@ using SomtelTechnicalManagmentSystem_STM.Data;
 namespace SomtelTechnicalManagmentSystem_STM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230322080846_UpdatingOcsSupport2")]
-    partial class UpdatingOcsSupport2
+    [Migration("20230327142658_initalsetup")]
+    partial class initalsetup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -330,8 +330,8 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                     b.Property<string>("DurationType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FreeUnitId")
-                        .HasColumnType("int");
+                    b.Property<string>("FreeUnitId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FreeUnitName")
                         .HasColumnType("nvarchar(max)");

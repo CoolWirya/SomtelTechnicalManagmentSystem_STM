@@ -6,6 +6,7 @@ using SomtelTechnicalManagmentSystem_STM.Data.Security;
 using SomtelTechnicalManagmentSystem_STM.Data.Services;
 
 using SomtelTechnicalManagmentSystem_STM.Models.LoginModel;
+using SomtelTechnicalManagmentSystem_STM.Models.ViewPrivilegesModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -81,7 +82,7 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             if(Convert.ToBoolean(newUserDictionary["Added"]) == false)
             {
                 if (Convert.ToBoolean(newUserDictionary["UsernameIsOK"]) == false)
-                    ViewBag.UsernameId = "User Name Should contain between 6 to 15 characters, be ('letters''Numbers''_''-') and with no spaces";
+                    ViewBag.UsernameId = "User Name Should contain between 6 to 15 characters, lowercase, be ('letters''Numbers''_''-') and with no spaces";
                 if (Convert.ToBoolean(newUserDictionary["PhoneNumberIsOK"]) == false)
                     ViewBag.PhoneNumber = "Number is not in correct format, example: 659*******";
                 if (Convert.ToBoolean(newUserDictionary["EmailIsOK"]) == false)
@@ -285,6 +286,107 @@ namespace SomtelTechnicalManagmentSystem_STM.Controllers
             {
                 return Redirect("/");
             }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignPermissionsAjax(string UsernameId, string PrivilegeNameId)
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                if (UsernameId == null || PrivilegeNameId == null)
+                {
+                    List<Login> loginList = _service.GetAllIdAndUsername();
+                    if (UsernameId != null)
+                    {
+                        List<PrivilegeName> privilageList = _service.GetNotInMyPrivileges(int.Parse(UsernameId));
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName", UsernameId);
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        return View();
+                    }
+                    else
+                    {
+                        List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                        ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                        ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                        if (UsernameId == null)
+                            ViewBag.UserError = "Choose a user before submitting";
+                        if (PrivilegeNameId == null)
+                            ViewBag.PrivilegeError = "Choose a privilege before submitting";
+                        return View();
+
+                    }
+
+                }
+                else
+                {
+                    var results = _service.GetMyPrivileges(int.Parse(UsernameId));
+                    foreach (var result in results)
+                    {
+                        if (result.PrivilegeId == int.Parse(PrivilegeNameId))
+                        {
+                            List<Login> loginList = _service.GetAllIdAndUsername();
+                            List<PrivilegeName> privilageList = _service.GetAllPrivileges();
+                            ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                            ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+                            ViewBag.PrivilegeError = "User already have this permission";
+                            return View();
+                        }
+                    }
+
+                    Privilege privilege = new Privilege();
+                    privilege.LoginId = int.Parse(UsernameId);
+                    privilege.PrivilegeId = int.Parse(PrivilegeNameId);
+                    await _service.AddPrivilege(privilege);
+
+                    return Redirect("/");
+                }
+
+
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+        public async Task<IActionResult> AssignPermissionsAjax()
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                PrivilegesView privilegesView = new PrivilegesView();
+                privilegesView.logins = new List<Login>();
+                privilegesView.PrivilegeNames = new List<PrivilegeName>();
+
+
+                privilegesView.logins = _service.GetAllIdAndUsername();
+                privilegesView.PrivilegeNames = _service.GetAllPrivileges();
+                //ViewBag.UsernameId = new SelectList(loginList, "Id", "UserName");
+                //ViewBag.PrivilegeNameId = new SelectList(privilageList, "Id", "Name");
+
+                return View(privilegesView);
+            }
+            else
+            {
+                return Redirect("/");
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult AssignPermissionsAjaxGetMyPrivileges(int UsernameId)
+        {
+
+            if (User.IsInRole("Admin"))
+            {
+                var privilageList = _service.GetNotInMyPrivileges(UsernameId);
+                return Json( new { data = privilageList });
+
+            }
+            return null;
+
 
         }
         //Get: SignUp/Details/1

@@ -50,7 +50,8 @@
         public static bool ValidateUserName(string input)
         {
             bool pass = true;
-            var positiveIntRegex = new System.Text.RegularExpressions.Regex(@"^(?!\s*$)[A-Za-z\d-_.]+$");
+            //var positiveIntRegex = new System.Text.RegularExpressions.Regex(@"^(?!\s*$)[A-Za-z\d-_.]+$");
+            var positiveIntRegex = new System.Text.RegularExpressions.Regex(@"^(?!\s*$)[a-z\d-_.]+$");
             if (positiveIntRegex.IsMatch(input) == false)
             {
                 pass = false;

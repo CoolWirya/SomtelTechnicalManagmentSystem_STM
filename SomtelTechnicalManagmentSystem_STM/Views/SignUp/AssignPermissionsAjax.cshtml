@@ -1,0 +1,56 @@
+﻿@model SomtelTechnicalManagmentSystem_STM.Models.ViewPrivilegesModel.PrivilegesView
+
+
+<div class="row">
+    <h2> add privileges</h2>
+    <hr />
+    <div class="form-group">
+        @Html.LabelFor(x => x.Username, htmlAttributes: new { @class = "control-label col-md-2"})
+
+            @Html.DropDownListFor(x => x.Username, new SelectList(Model.logins, "Id","UserName"),"Select a Username", htmlAttributes: new { @class = "form-control", Id="ddlUsername"})
+
+    </div>
+    <div class="form-group" id="MyPrivilegesDiv">
+        @Html.LabelFor(x => x.MyPrivileges, htmlAttributes: new { @class = "control-label col-md-2"})
+
+        <select class="form-group" id="MyPriviligesDropdown" name="MyPriviligesDropdown"></select>
+
+    </div>
+</div>
+@section Scripts{
+
+
+<script>
+    $(document).ready(function () {
+        $('#MyPrivilegesDiv').hide();
+    });
+        $('#ddlUsername').change(function () {
+
+            var selectedValue = $(this).val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: '/SignUp/AssignPermissionsAjaxGetMyPrivileges',
+                data: {UsernameId: selectedValue},
+                success:
+                function(response){
+                    console.log(response);
+                    var markup = "<option value='0'> Select Permissions</option>";
+                    for( var i =0; i< response.data.length; i++) {
+                            markup += "<option value='" + response.data[i].id + "'>" + response.data[i].name + "</option>"
+                    }
+                        $("#MyPriviligesDropdown").html(markup);
+                        $('#MyPrivilegesDiv').show();
+
+                },
+                error: 
+                function (response)
+                {
+                    alert("error" + response)
+                },
+            })
+           // $('#MyPrivilegesDiv').();
+    });
+
+</script>
+}

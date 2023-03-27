@@ -144,7 +144,6 @@ namespace SomtelTechnicalManagmentSystem_STM.Data.Services
             return newLogin;
         }
 
-
         public async Task<Dictionary<string, object>> AddNewUser(Login signup)
         {
             Dictionary<string, object> newUserDictionary = new Dictionary<string, object>();

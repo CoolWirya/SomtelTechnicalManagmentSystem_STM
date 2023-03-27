@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SomtelTechnicalManagmentSystem_STM.Migrations
 {
-    public partial class intialsetup : Migration
+    public partial class initalsetup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,6 +21,62 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NavbarParent", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OcsApiLogs",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExchangeNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApiRequest = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApiResponse = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApiFunction = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OcsApiLogs", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OcsExceptions",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExchangeNo = table.Column<int>(type: "int", nullable: false),
+                    Exception = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExceptionFrom = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OcsExceptions", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OcsServices",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServiceID = table.Column<int>(type: "int", nullable: false),
+                    ServiceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    DurationType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Channel = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FreeUnitVolume = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FreeUnitName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FreeUnitId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<float>(type: "real", nullable: false),
+                    DeleteFlag = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OcsServices", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -438,6 +494,15 @@ namespace SomtelTechnicalManagmentSystem_STM.Migrations
 
             migrationBuilder.DropTable(
                 name: "NavbarParent");
+
+            migrationBuilder.DropTable(
+                name: "OcsApiLogs");
+
+            migrationBuilder.DropTable(
+                name: "OcsExceptions");
+
+            migrationBuilder.DropTable(
+                name: "OcsServices");
 
             migrationBuilder.DropTable(
                 name: "Privileges");
